@@ -5,11 +5,13 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(BoxCollider))]
 public abstract class Platform : MonoBehaviour
 {
-    [SerializeField] private Map map;
+    [SerializeField] private Map        map;
     [SerializeField] private Vector3Int mapPosition;
 
-    public Platform[] LocalPlatforms;
-    public static GameObject PlatformPrefab;
+    public Platform[] LocalPlatforms = new Platform[4];
+
+    public static GameObject VoidPlatformPrefab;
+
     public virtual bool VoidMode { get; set; }
 
     public Map Map
@@ -19,8 +21,8 @@ public abstract class Platform : MonoBehaviour
         {
             if (map == value)
                 return;
-
             map = value;
+
             for (int i = 0; i < LocalPlatforms.Length; i++)
                 if (LocalPlatforms[i] != null)
                     LocalPlatforms[i].Map = value;
@@ -33,6 +35,7 @@ public abstract class Platform : MonoBehaviour
         set
         {
             mapPosition = value;
+
             if (Map.platforms.TryGetValue(mapPosition, out Platform platform))
                 Map.platforms[mapPosition] = this;
             else
@@ -49,10 +52,13 @@ public abstract class Platform : MonoBehaviour
         }
     }
 
-    protected void Awake()
+    protected void Start()
     {
-        LocalPlatforms = new Platform[4];
+        gameObject.name = GetType().Name;
+        SetProperties();
     }
+
+    protected abstract void SetProperties();
 
     public void Copy(Platform other)
     {

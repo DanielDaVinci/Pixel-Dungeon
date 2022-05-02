@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class VoidPlatform : Platform
+public sealed class VoidPlatform : Platform
 {
-    private void Start()
+    protected override void SetProperties()
     {
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
         meshRenderer.material = Resources.Load<Material>("Materials/VoidPlatformMaterial");
@@ -13,13 +14,11 @@ public class VoidPlatform : Platform
 
     private void OnMouseUpAsButton()
     {
+        if (UIInfo.MouseOnUI)
+            return;
+
         SimplePlatform newScript = gameObject.AddComponent<SimplePlatform>();
         newScript.Copy(this);
         Destroy(this);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("asd");
     }
 }

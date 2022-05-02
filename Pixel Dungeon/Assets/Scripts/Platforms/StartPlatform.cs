@@ -6,6 +6,6 @@ public class StartPlatform : SimplePlatform
 {
     protected new void Start()
     {
-
+        base.Start();
     }
 }

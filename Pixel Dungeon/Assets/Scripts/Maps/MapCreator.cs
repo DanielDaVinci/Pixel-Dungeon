@@ -4,8 +4,26 @@ using UnityEngine;
 
 public class MapCreator : Map
 {
-    private bool voidMode;
-    public bool VoidMode
+    private static GameObject voidPlatformPrefab;
+    private static bool       voidMode;
+
+    public static GameObject VoidPlatformPrefab
+    {
+        get { return voidPlatformPrefab; }
+        set
+        {
+            voidPlatformPrefab = value;
+            Platform.VoidPlatformPrefab = voidPlatformPrefab;
+
+            if (voidMode)
+            {
+                VoidMode = false;
+                VoidMode = true;
+            }
+        }
+    }
+
+    public static bool VoidMode
     {
         get { return voidMode; }
         set 
@@ -16,16 +34,10 @@ public class MapCreator : Map
     }
     private new void Start()
     {
-        platforms = new Dictionary<Vector3Int, Platform>();
+        GameObject platform = Instantiate(startPlatformPrefab, transform);
 
-        Platform.PlatformPrefab = platformPrefab;
-        GameObject platform = Instantiate(platformPrefab);
-        platform.transform.parent = transform;
-
-        startPlatform = platform.AddComponent<StartPlatform>();
+        startPlatform = platform.GetComponent<StartPlatform>() ?? platform.AddComponent<StartPlatform>();
         startPlatform.Map = this;
         startPlatform.MapPosition = new Vector3Int(0, 0, 0);
-        // Test
-        startPlatform.VoidMode = true;
     }
 }

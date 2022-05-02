@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SimplePlatform : Platform
 {
-    private bool voidMode;
+    [SerializeField] private bool voidMode;
     public override bool VoidMode
     {
         get { return voidMode; }
@@ -12,8 +12,8 @@ public class SimplePlatform : Platform
         {
             if (voidMode == value)
                 return;
-
             voidMode = value;
+
             for (int i = 0; i < LocalPlatforms.Length; i++)
                 if (LocalPlatforms[i] != null)
                     LocalPlatforms[i].VoidMode = voidMode;
@@ -25,7 +25,7 @@ public class SimplePlatform : Platform
         }
     }
 
-    protected void Start()
+    protected override void SetProperties()
     {
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
         meshRenderer.material = Resources.Load<Material>("Materials/SimplePlatformMaterial");
@@ -36,16 +36,16 @@ public class SimplePlatform : Platform
     {
         for (int i = 0; i < LocalPlatforms.Length; i++)
         {
-            if (LocalPlatforms[i] == null)
-            {
-                GameObject voidPlatform = Instantiate(PlatformPrefab, transform.parent);
-                voidPlatform.transform.localPosition = transform.localPosition + (Vector3)IdentifyDirection(i + 1) *
-                    (i % 2 == 0 ? voidPlatform.transform.GetComponent<BoxCollider>().size.x : voidPlatform.transform.GetComponent<BoxCollider>().size.y);
-                LocalPlatforms[i] = voidPlatform.AddComponent<VoidPlatform>();
-                LocalPlatforms[i].Map = Map;
-                LocalPlatforms[i].MapPosition = MapPosition + IdentifyDirection(i + 1);
-                LocalPlatforms[i].VoidMode = VoidMode;
-            }
+            if (LocalPlatforms[i] != null)
+                continue;
+
+            GameObject voidPlatform = Instantiate(VoidPlatformPrefab, transform.parent);
+            voidPlatform.transform.localPosition = transform.localPosition + (Vector3)IdentifyDirection(i + 1) *
+                (i % 2 == 0 ? voidPlatform.transform.GetComponent<BoxCollider>().size.x : voidPlatform.transform.GetComponent<BoxCollider>().size.y);
+            LocalPlatforms[i] = voidPlatform.AddComponent<VoidPlatform>();
+            LocalPlatforms[i].Map = Map;
+            LocalPlatforms[i].MapPosition = MapPosition + IdentifyDirection(i + 1);
+            LocalPlatforms[i].VoidMode = VoidMode;
         }
     }
 
@@ -54,7 +54,7 @@ public class SimplePlatform : Platform
         for (int i = 0; i < LocalPlatforms.Length; i++)
         {
             if ((LocalPlatforms[i] != null) && (LocalPlatforms[i].GetComponent<VoidPlatform>()))
-                Destroy(LocalPlatforms[i]);
+                DestroyImmediate(LocalPlatforms[i].gameObject);
         }
     }
 }
